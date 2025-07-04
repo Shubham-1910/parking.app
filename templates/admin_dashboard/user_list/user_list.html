@@ -1,0 +1,62 @@
+{% extends "index.html" %} {% block title %}Registered Users{% endblock %} {%
+block content %}
+<div class="container my-4">
+  <h3 class="mb-3">Registered Users</h3>
+  <div class="table-responsive">
+    <table class="table table-striped table-dark table-bordered align-middle">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Email</th>
+          <th scope="col">Full Name</th>
+          <th scope="col">Address</th>
+          <th scope="col">Pin code</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users[:3] %}
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.address or '-' }}</td>
+          <td>{{ user.state or '-' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if users|length > 3 %}
+    <div class="collapse" id="moreUsers">
+      <table
+        class="table table-striped table-dark table-bordered align-middle mb-0"
+      >
+        <tbody>
+          {% for user in users[3:] %}
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.address or '-' }}</td>
+            <td>{{ user.state or '-' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="text-center">
+      <button
+        class="btn btn-outline-dark mt-2"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#moreUsers"
+        aria-expanded="false"
+        aria-controls="moreUsers"
+      >
+        Show More
+      </button>
+    </div>
+    {% endif %}
+  </div>
+
+  
+{% endblock %}

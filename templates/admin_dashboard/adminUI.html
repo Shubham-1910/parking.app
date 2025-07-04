@@ -1,0 +1,31 @@
+{% extends "index.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <h2 class="mb-4">Parking Lots</h2>
+  <div class="row g-4">
+{% for lot in lots %}
+  {% include "admin_dashboard/parking_card_lot.html" %}
+  {% include "admin_dashboard/view_delete_parking_lot_modal.html" %}
+  <!-- Edit Parking Lot Modal (example for Lot #1) -->
+  {% include "admin_dashboard/edit_parking_lot_modal.html" %}
+{% endfor %}
+  </div>
+
+  <!-- Add Parking Lot Button -->
+  <div class="d-flex justify-content-end mt-4">
+    <button
+      class="btn btn-success"
+      data-bs-toggle="modal"
+      data-bs-target="#addLotModal"
+    >
+      + Add Lot
+    </button>
+  </div>
+</div>
+ 
+<!-- Add Parking Lot Modal -->
+{% include "admin_dashboard/add_parking_lot_modal.html" %}
+<!-- Occupied Parking Spot Details Modal (example for Spot 1) -->
+{% include "admin_dashboard/occupied_parking_spot_detail_modal.html" %}
+{% endblock %}

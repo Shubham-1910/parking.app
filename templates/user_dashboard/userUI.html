@@ -1,0 +1,155 @@
+{% extends "index.html" %} {% block title %}Admin dashboard{% endblock %} {%
+block content %}
+<div class="container my-5">
+  <h2 class="mb-4">User Dashboard</h2>
+
+  <!-- Recent Parking History (Collapsible) -->
+  <div class="accordion mb-4" id="historyAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingHistory">
+        <button
+          class="accordion-button"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#collapseHistory"
+          aria-expanded="true"
+          aria-controls="collapseHistory"
+        >
+          Recent Parking History
+        </button>
+      </h2>
+      <div
+        id="collapseHistory"
+        class="accordion-collapse collapse show"
+        aria-labelledby="headingHistory"
+        data-bs-parent="#historyAccordion"
+      >
+        <div class="accordion-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Vehicle No</th>
+                <th>Timestamp</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>5th Avenue, New York</td>
+                <td>NY310921</td>
+                <td>2024-06-20 10:30</td>
+                <td>
+                  <button
+                    class="btn btn-outline-danger btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#releaseModal136"
+                  >
+                    Release
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>Market Street, San Francisco</td>
+                <td>CA318888</td>
+                <td>2024-06-18 15:00</td>
+                <td>
+                  <button class="btn btn-outline-info btn-sm">
+                    Parking out
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Parking Form -->
+  <form class="mb-4" method="GET" action="">
+    <div class="input-group">
+      <input
+        type="text"
+        class="form-control"
+        name="search"
+        placeholder="Search parking @location/zip code"
+        aria-label="Search parking"
+      />
+      <button class="btn btn-outline-primary" type="submit">Search</button>
+    </div>
+  </form>
+
+  <!-- Parking Lots (Collapsible) -->
+  <div class="accordion" id="lotsAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingLots">
+        <button
+          class="accordion-button"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#collapseLots"
+          aria-expanded="true"
+          aria-controls="collapseLots"
+        >
+          Parking Lots @ 5th Avenue, New York
+        </button>
+      </h2>
+      <div
+        id="collapseLots"
+        class="accordion-collapse collapse show"
+        aria-labelledby="headingLots"
+        data-bs-parent="#lotsAccordion"
+      >
+        <div class="accordion-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Address</th>
+                <th>Availability</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>136</td>
+                <td>5th Avenue, New York, NY</td>
+                <td>10</td>
+                <td>
+                  <button
+                    class="btn btn-outline-success btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#bookModal136"
+                  >
+                    Book
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>132</td>
+                <td>Market Street, San Francisco, CA</td>
+                <td>6</td>
+                <td>
+                  <button
+                    class="btn btn-outline-success btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#bookModal136"
+                  >
+                    Book
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Release Modal -->
+<!-- Release Modal for Spot 136 -->
+{% include "user_dashboard/releasing_modals.html" %}
+
+<!-- Book Parking Spot Modal for Spot 136 (example) -->
+{% include "user_dashboard/parking_modals.html" %} {% endblock %}

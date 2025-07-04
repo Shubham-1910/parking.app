@@ -1,0 +1,47 @@
+form_fields = [
+    {"id": "form3Example1m", "name": "username", "placeholder": "Fill Username", "label": "Username"},
+    {"id": "form3Example97", "name": "email", "placeholder": "Email ID", "label": "Email ID", "type": "email"},
+    {"id": "form3Example8", "name": "address", "placeholder": "Address", "label": "Address"},
+
+    {"id": "form3Example1p", "name": "password", "placeholder": "Password", "label": "Password", "type": "password"},
+    {"id": "form3Example1cp", "name": "confirm_password", "placeholder": "Confirm Password", "label": "Confirm Password", "type": "password"}
+]
+
+stateCityMap = {
+            "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur"],
+            "Arunachal Pradesh": ["Itanagar"],
+            "Assam": ["Guwahati", "Dibrugarh"],
+            "Bihar": ["Patna", "Gaya"],
+            "Chhattisgarh": ["Raipur", "Bilaspur"],
+            "Goa": ["Panaji", "Margao"],
+            "Gujarat": ["Ahmedabad", "Surat", "Vadodara"],
+            "Haryana": ["Gurgaon", "Faridabad" , "Bhiwani"],
+            "Himachal Pradesh": ["Shimla", "Manali"],
+            "Jharkhand": ["Ranchi", "Jamshedpur"],
+            "Karnataka": ["Bangalore", "Mysore"],
+            "Kerala": ["Thiruvananthapuram", "Kochi"],
+            "Madhya Pradesh": ["Bhopal", "Indore"],
+            "Maharashtra": ["Mumbai", "Pune", "Nagpur"],
+            "Manipur": ["Imphal"],
+            "Meghalaya": ["Shillong"],
+            "Mizoram": ["Aizawl"],
+            "Nagaland": ["Kohima"],
+            "Odisha": ["Bhubaneswar", "Cuttack"],
+            "Punjab": ["Chandigarh", "Ludhiana"],
+            "Rajasthan": ["Jaipur", "Udaipur"],
+            "Sikkim": ["Gangtok"],
+            "Tamil Nadu": ["Chennai", "Coimbatore"],
+            "Telangana": ["Hyderabad", "Warangal"],
+            "Tripura": ["Agartala"],
+            "Uttar Pradesh": ["Lucknow", "Kanpur"],
+            "Uttarakhand": ["Dehradun"],
+            "West Bengal": ["Kolkata", "Darjeeling"],
+            "Andaman and Nicobar Islands": ["Port Blair"],
+            "Chandigarh": ["Chandigarh"],
+            "Dadra and Nagar Haveli and Daman and Diu": ["Daman"],
+            "Lakshadweep": ["Kavaratti"],
+            "Delhi": ["New Delhi"],
+            "Puducherry": ["Puducherry"],
+            "Ladakh": ["Leh"],
+            "Jammu and Kashmir": ["Srinagar", "Jammu"]
+}

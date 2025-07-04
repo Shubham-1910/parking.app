@@ -1,0 +1,24 @@
+{% for i in range(1, 4) %}
+<div class="modal fade" id="occupiedSpotModal{{ i }}" tabindex="-1" aria-labelledby="occupiedSpotModalLabel{{ i }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="occupiedSpotModalLabel{{ i }}">Occupied Parking Spot Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group">
+          <li class="list-group-item"><strong>ID:</strong> {{ i }}</li>
+          <li class="list-group-item"><strong>Customer ID:</strong> 123</li>
+          <li class="list-group-item"><strong>Vehicle number:</strong> MH12AB1234</li>
+          <li class="list-group-item"><strong>Date/time of parking:</strong> 2024-06-21 10:00</li>
+          <li class="list-group-item"><strong>Est. parking cost:</strong> ₹40</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
