@@ -230,102 +230,185 @@ def add_lot():
 
 @app.route('/edit_lot/<int:lot_id>', methods=['POST'])
 def edit_lot(lot_id):
+    # 1. Find the parking lot by its ID, or show 404 if not found
     lot = ParkingLot.query.get_or_404(lot_id)
+
+    # 2. Update the lot's details from the form
     lot.prime_location_name = request.form['prime_location_name']
     lot.address = request.form['address']
     lot.pin_code = request.form['pin_code']
     lot.price = float(request.form['price'])
-    new_spots_len = int(request.form['maximum_number_of_spots'])
-    current_spots = len(lot.spots)
-    lot.maximum_number_of_spots = new_spots_len
+
+    # 3. Find out how many spots the lot should have now
+    new_max_spots = int(request.form['maximum_number_of_spots'])
+    current_spots_count = len(lot.spots)
+    lot.maximum_number_of_spots = new_max_spots
+
+    # 4. Save the lot's new details to the database
     db.session.commit()
-    if new_spots_len > current_spots:
-        for _ in range(new_spots_len - current_spots):
+
+    # 5. If more spots are needed, add new available spots
+    if new_max_spots > current_spots_count:
+        spots_to_add = new_max_spots - current_spots_count
+        for _ in range(spots_to_add):
             new_spot = ParkingSpot(lot_id=lot.id, status=SpotStatus.AVAILABLE)
             db.session.add(new_spot)
         db.session.commit()
-    elif new_spots_len < current_spots:
+
+    # 6. If fewer spots are needed, remove available spots (never remove occupied spots!)
+    elif new_max_spots < current_spots_count:
+        # Find all available spots in this lot
         available_spots = [spot for spot in lot.spots if spot.status == SpotStatus.AVAILABLE]
-        spots_to_remove = current_spots - new_spots_len
+        spots_to_remove = current_spots_count - new_max_spots
+        # Remove only as many available spots as needed
         for spot in available_spots[:spots_to_remove]:
             db.session.delete(spot)
         db.session.commit()
+
+    # 7. Show a success message and redirect back
     flash('Parking lot updated!', 'success')
     return redirect(request.referrer or url_for('admin_dashboard'))
 
 @app.route('/delete_lot/<int:lot_id>', methods=['POST'])
 def delete_lot(lot_id):
+    # 1. Find the parking lot by its ID, or show 404 if not found
     lot = ParkingLot.query.get_or_404(lot_id)
-    occupied_spots = [spot for spot in lot.spots if spot.status == SpotStatus.OCCUPIED]
-    if occupied_spots:
-        flash('Cannot delete lot: one or more spots are currently occupied.', 'danger')
-        return redirect(request.referrer or url_for('admin_dashboard'))
+
+    # 2. Check if any spot in this lot is occupied
+    for spot in lot.spots:
+        if spot.status == SpotStatus.OCCUPIED:
+            flash('Cannot delete lot: one or more spots are currently occupied.', 'danger')
+            # Go back to the previous page or admin dashboard
+            return redirect(request.referrer or url_for('admin_dashboard'))
+
+    # 3. If all spots are free, delete the lot from the database
     db.session.delete(lot)
     db.session.commit()
+
+    # 4. Show a success message and redirect back
     flash('Parking lot deleted!', 'success')
     return redirect(request.referrer or url_for('admin_dashboard'))
 
 @app.route('/delete_spot/<int:spot_id>', methods=['POST'])
 def delete_spot(spot_id):
+    # 1. Find the parking spot by its ID, or show 404 if not found
     spot = ParkingSpot.query.get_or_404(spot_id)
+
+    # 2. Check if this spot has any reservations
     if spot.reservations:
         flash('Cannot delete spot: it has reservations.', 'danger')
+        # Go back to the previous page or admin dashboard
         return redirect(request.referrer or url_for('admin_dashboard'))
+
+    # 3. Find the lot this spot belongs to
     lot = spot.lot
+
+    # 4. Delete the spot from the database
     db.session.delete(spot)
     db.session.commit()
+
+    # 5. Update the lot's maximum number of spots
     lot.maximum_number_of_spots = len(lot.spots)
     db.session.commit()
+
+    # 6. Show a success message and redirect back
     flash('Parking spot deleted!', 'success')
     return redirect(request.referrer or url_for('admin_dashboard'))
 
 @app.route('/reserve/<int:lot_id>', methods=['POST'])
 def reserve_spot(lot_id):
-    if 'user_id' not in session or session.get('role') != 'user':
+    # 1. Check if the user is logged in and is a regular user
+    user_id = session.get('user_id')
+    user_role = session.get('role')
+    if not user_id or user_role != 'user':
         return redirect(url_for('login'))
+    # 2. Find the parking lot by its ID, or show 404 if not found
     lot = ParkingLot.query.get_or_404(lot_id)
-    spot = ParkingSpot.query.filter_by(lot_id=lot.id, status=SpotStatus.AVAILABLE).first()
-    if not spot:
+
+    # 3. Find an available spot in this lot
+    available_spot = ParkingSpot.query.filter_by(lot_id=lot.id, status=SpotStatus.AVAILABLE).first()
+
+    # 4. If no spot is available, show a message and go back to dashboard
+    if not available_spot:
         flash('No available spots in this lot.', 'danger')
         return redirect(url_for('user_dashboard'))
-    vehicle_no = request.form.get('vehicle_no')
-    reservation = Reservation(
-        spot_id=spot.id,
-        user_id=session['user_id'],
+    # 5. Get the vehicle number from the form
+    vehicle_number = request.form.get('vehicle_no')
+
+    # 6. Create a new reservation for this spot and user
+    new_reservation = Reservation(
+        spot_id=available_spot.id,
+        user_id=user_id,
         parking_timestamp=datetime.datetime.now(),
-        parking_cost=0,
-        vehicle_number=vehicle_no
+        parking_cost=0,  # Cost is 0 at reservation time
+        vehicle_number=vehicle_number
     )
-    spot.status = SpotStatus.OCCUPIED
-    db.session.add(reservation)
+    # 7. Mark the spot as occupied
+    available_spot.status = SpotStatus.OCCUPIED
+
+    # 8. Save the reservation and update the spot in the database
+    db.session.add(new_reservation)
     db.session.commit()
-    flash(f'Spot #{spot.id} reserved!', 'success')
+
+    # 9. Show a success message and go back to dashboard
+    flash(f'Spot #{available_spot.id} reserved!', 'success')
     return redirect(url_for('user_dashboard'))
 
 @app.route('/release/<int:reservation_id>', methods=['POST'])
 def release_spot(reservation_id):
+    # 1. Find the reservation by its ID, or show 404 if not found
     reservation = Reservation.query.get_or_404(reservation_id)
-    if reservation.user_id != session.get('user_id'):
-        flash('Unauthorized', 'danger')
+    
+    # 2. Check if the logged-in user owns this reservation
+    current_user_id = session.get('user_id')
+    if reservation.user_id != current_user_id:
+        flash('You are not allowed to release this spot.', 'danger')
         return redirect(url_for('user_dashboard'))
-    if reservation.leaving_timestamp:
-        flash('Spot already released.', 'info')
+    
+    # 3. If the spot is already released, inform the user
+    if reservation.leaving_timestamp is not None:
+        flash('This spot has already been released.', 'info')
         return redirect(url_for('user_dashboard'))
-    reservation.leaving_timestamp = datetime.datetime.now()
+    
+    # 4. Set the leaving time to now
+    now = datetime.datetime.now()
+    reservation.leaving_timestamp = now
+    
+    # 5. Calculate the parking duration in hours
+    parked_time = reservation.leaving_timestamp - reservation.parking_timestamp
+    hours_parked = parked_time.total_seconds() / 3600  # convert seconds to hours
+    
+    # 6. Calculate the cost (lot.price is the price per hour)
     lot = reservation.spot.lot
-    duration_hours = (reservation.leaving_timestamp - reservation.parking_timestamp).total_seconds() / 3600
-    reservation.parking_cost = round(duration_hours * lot.price, 2)
+    cost = round(hours_parked * lot.price, 2)
+    reservation.parking_cost = cost
+    
+    # 7. Mark the spot as available again
     reservation.spot.status = SpotStatus.AVAILABLE
+    
+    # 8. Save all changes to the database
     db.session.commit()
-    flash(f'Spot released. Total cost: ₹{reservation.parking_cost}', 'success')
+    
+    # 9. Show a success message to the user
+    flash(f'Spot released! Total cost: ₹{cost}', 'success')
     return redirect(url_for('user_dashboard'))
 
 @app.route('/history')
 def history():
-    if 'user_id' not in session or session.get('role') != 'user':
+    # Step 1: Check if user is logged in and is a 'user'
+    user_id = session.get('user_id')
+    user_role = session.get('role')
+    if not user_id or user_role != 'user':
+        # Step 2: Redirect to login if not logged in or not a user
         return redirect(url_for('login'))
-    reservations = Reservation.query.filter_by(user_id=session['user_id']).order_by(Reservation.parking_timestamp.desc()).all()
-    return render_template('history.html', reservations=reservations)
+    
+    # Step 3: Get all reservations for this user, newest first
+    user_reservations = Reservation.query.filter_by(user_id=user_id)\
+                                         .order_by(Reservation.parking_timestamp.desc())\
+                                         .all()
+    
+    # Step 4: Render the history page with these reservations
+    return render_template('history.html', reservations=user_reservations)
 
 if __name__ == '__main__':
     app.run(debug=True)

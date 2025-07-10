@@ -1,16 +1,16 @@
-{% for i in range(1, 16) %}
+{% for spot in lot.spots %}
 <div
   class="modal fade"
-  id="viewSpotModal{{ i }}"
+  id="viewSpotModal{{ spot.id }}"
   tabindex="-1"
-  aria-labelledby="viewSpotModalLabel{{ i }}"
+  aria-labelledby="viewSpotModalLabel{{ spot.id }}"
   aria-hidden="true"
 >
   <div class="modal-dialog">
-    <form>
+    <form method="POST" action="{{ url_for('main.delete_spot', spot_id=spot.id) }}">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="viewSpotModalLabel{{ i }}">
+          <h5 class="modal-title" id="viewSpotModalLabel{{ spot.id }}">
             View/Delete Parking Spot
           </h5>
           <button
@@ -22,22 +22,14 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">ID</label>
-            <input type="text" class="form-control" value="{{ i }}" readonly />
+            <input type="text" class="form-control" value="{{ spot.id }}" readonly />
           </div>
           <div class="mb-3">
             <label class="form-label">Status</label>
-            {% if i <= 3 %}
-            <button
-              type="button"
-              class="btn btn-danger"
-              data-bs-toggle="modal"
-              data-bs-target="#occupiedSpotModal{{ i }}"
-              data-bs-dismiss="modal"
-            >
-              O
-            </button>
+            {% if spot.status == SpotStatus.OCCUPIED %}
+              <button type="button" class="btn btn-danger">O</button>
             {% else %}
-            <button class="btn btn-success">A</button>
+              <button type="button" class="btn btn-success">A</button>
             {% endif %}
           </div>
         </div>
@@ -47,9 +39,9 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            Close
+            Cancel
           </button>
-          <button type="button" class="btn btn-danger">Delete</button>
+          <button type="submit" class="btn btn-danger">Delete</button>
         </div>
       </div>
     </form>

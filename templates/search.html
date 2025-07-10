@@ -1,10 +1,11 @@
-{% extends "index.html" %} {% block title %}Search{% endblock %} {% block
-content %}
+{% extends "index.html" %}
+{% block title %}Search{% endblock %}
+{% block content %}
 <div class="container my-4">
   <form
     class="row g-2 align-items-center mb-4"
     method="get"
-    action="{{ url_for('main.search') }}"
+    action="{{ url_for('search') }}"
   >
     <div class="col-auto">
       <div class="input-group">
@@ -12,8 +13,6 @@ content %}
           <option value="user_id">User ID</option>
           <option value="username">Username</option>
           <option value="user_email">User Email</option>
-          <!-- Collapsible options below -->
-
           <option value="user_address">User Address</option>
           <option value="user_city">User City</option>
           <option value="user_state">User State</option>
@@ -27,7 +26,6 @@ content %}
           <option value="reservation_user_id">Reservation User ID</option>
           <option value="reservation_spot_id">Reservation Spot ID</option>
         </select>
-   
       </div>
     </div>
     <div class="col-auto">
@@ -44,61 +42,59 @@ content %}
     </div>
   </form>
 
-  {% if search_by == 'user_id' and results %}
-  <h5>Users Found:</h5>
-  <table class="table table-striped table-dark table-bordered align-middle">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Email</th>
-        <th>Full Name</th>
-        <th>Address</th>
-        <th>Pin code</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for user in results %}
-      <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.username }}</td>
-        <td>{{ user.address }}</td>
-        <td>{{ user.pin }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% elif search_by == 'location' and results %}
-  <h5>Example search parking lots @{{ query }} location</h5>
-  <div class="row">
-    {% for lot in results %}
-    <div class="col-md-4 mb-4">
-      <div class="card shadow">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h5 class="card-title mb-0">Parking#{{ lot.lot_id }}</h5>
-            <div>
-              <a href="#" class="text-warning me-2">Edit</a>
-              <a href="#" class="text-danger">Delete</a>
-            </div>
-          </div>
-          <div class="mb-2 text-success">
-            (Occupied : {{ lot.occupied }}/{{ lot.total }})
-          </div>
-          <div>
-            {% for s in lot.spots %} {% if s == 'O' %}
-            <button class="btn btn-sm btn-danger mb-1" disabled>O</button>
-            {% else %}
-            <button class="btn btn-sm btn-success mb-1" disabled>A</button>
-            {% endif %} {% endfor %}
-          </div>
-        </div>
-      </div>
-    </div>
+{% if results %}
+  {% if parent_field == 'user' %}
+    {% set users = results %}
+    {% include "admin_dashboard/user_list/user_list.html" %}
+{% elif parent_field == 'lot' %}
+  {% set lots = results %}
+  <div class="row g-4">
+    {% for lot in lots %}
+      {% include "admin_dashboard/parking_card_lot.html" %}
     {% endfor %}
   </div>
-  {% elif query %}
-  <div class="alert alert-warning">No results found.</div>
+  {% elif parent_field == 'spot' %}
+    {# Replace with your actual spot result file if you have one #}
+    {% set spots = results %}
+    {% include "user_dashboard/parking_lot.html" %}
+  {% elif parent_field == 'reservation' %}
+    {# Replace with your actual reservation result file if you have one #}
+    {% set reservations = results %}
+    {% include "user_dashboard/history.html" %}
+  {% else %}
+    <div class="alert alert-warning">No results found.</div>
   {% endif %}
+{% elif query %}
+  <div class="alert alert-warning">No results found.</div>
+{% endif %}
 </div>
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
